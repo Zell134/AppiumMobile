@@ -27,88 +27,82 @@ public class EqualizerPageTest extends BaseTest {
     @Description("Equalizer is opened via main menu")
     @Test
     public void equalizerOpenedViaMainMenu() {
-        PlaylistPage playlist = new PlaylistPage();
-        playlist.ifPlaylistExistOnPage();
+
+        ifPlaylistExistOnPage();
 
         HeaderPage header = new HeaderPage();
-        header.menuBtnClick();
-        MainMenuPage menu = new MainMenuPage();
-        menu.qualizerBtnClick();
-        EqualizerPage equalizer = new EqualizerPage();
-        equalizer.isSeekBarsVisible();
+        EqualizerPage equalizer = header
+                .menuBtnClick()
+                .qualizerBtnClick()
+                .isSeekBarsVisible();
 
-        header.menuBtnClick();
-        menu.qualizerBtnClick();
-        playlist.ifPlaylistExistOnPage();
+        header.menuBtnClick()
+                .qualizerBtnClick();
+
+        ifPlaylistExistOnPage();
     }
 
     @Description("Equalizer is closed after \"Back\" button is clicked")
     @Test
     public void equalizerIsClosed_OnBackButtonClicked() {
-        ControlsPage controls = new ControlsPage();
-        controls.equalizerClick();
-        EqualizerPage equalizer = new EqualizerPage();
-        equalizer.isSeekBarsVisible();
-        equalizer.clickBackButon();
-
-        PlaylistPage playlist = new PlaylistPage();
-        playlist.ifPlaylistExistOnPage();
+        openEqualizer()
+                .isSeekBarsVisible()
+                .clickBackButon();
+        ifPlaylistExistOnPage();
     }
 
     @Description("Equalizer is closed after android back button is pressed")
     @Test
     public void equalizerIsClosed_OnBackPressed() {
-        EqualizerPage equalizer = openEqualizer();
-        equalizer.isSeekBarsVisible();
+        openEqualizer()
+                .isSeekBarsVisible();
         DriverHelper.goBack();
-
-        PlaylistPage playlist = new PlaylistPage();
-        playlist.ifPlaylistExistOnPage();
+        ifPlaylistExistOnPage();
     }
 
-    @Description("Preset list is populated by presets")
+    @Description("Default preset is \"" + DEFAULT_PRESET + "\"")
     @Test
     public void usersPresetIsDefault() {
-        EqualizerPage equalizer = openEqualizer();
-        equalizer.presetListButtonIsVisible();
-        step("Defaul preset is \"" + DEFAULT_PRESET + "\"", () -> {
-            assertThat(DEFAULT_PRESET).isEqualTo(equalizer.getPresetListCurrentValue());
-        });
+        openEqualizer()
+                .presetListButtonIsVisible()
+                .checkPresetListCurrentValue(DEFAULT_PRESET);
     }
 
     @Description("Preset list is populated by presets")
     @Test
     public void presetListIsPopulatedByPresets() {
-        EqualizerPage equalizer = openEqualizer();
-        equalizer.presetListButtonIsVisible();
-        equalizer.clickPresetListButton();
-        equalizer.isPresetListPopulated();
+        openEqualizer()
+                .presetListButtonIsVisible()
+                .clickPresetListButton()
+                .isPresetListPopulated();
     }
 
     @Description("Selected preset displays in preset list text field")
     @Test
     public void selectedPresetDisplays() {
         EqualizerPage equalizer = openEqualizer();
-        selectAnyPreset(equalizer);
-    }
-    
-    private void selectAnyPreset(EqualizerPage equalizer) {
-        equalizer.presetListButtonIsVisible();
-        equalizer.clickPresetListButton();
+
+        equalizer.presetListButtonIsVisible()
+                .clickPresetListButton();
         int selectedPosition = new Random().nextInt(equalizer.getPresetsQuantity());
         String expectedValue = equalizer.getPresetListValue(selectedPosition);
-        equalizer.selectPresetsByPosition(selectedPosition);
+        equalizer
+                .selectPresetsByPosition(selectedPosition);
         String actualValue = equalizer.getPresetListCurrentValue();
 
-        step("Selected preset displays in preset list text field", ()
-                -> assertThat(actualValue).isEqualTo(expectedValue)
-        );
+        equalizer
+                .checkPresetListCurrentValue(actualValue);
     }
 
     private EqualizerPage openEqualizer() {
         ControlsPage controls = new ControlsPage();
         controls.equalizerClick();
         return new EqualizerPage();
+    }
+
+    private void ifPlaylistExistOnPage(){
+        PlaylistPage playlist = new PlaylistPage();
+        playlist.ifPlaylistExistOnPage();
     }
 
 }

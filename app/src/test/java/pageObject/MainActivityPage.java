@@ -11,8 +11,9 @@ public class MainActivityPage implements BasePageInterface {
     private final SelenideElement grantPermissionButton = $(MobileBy.id("com.zell.musicplayer:id/button"));
 
     @Step("Check if current page is Main activity page")
-    public boolean ifGrantPermissionButtonExistOnPage() {
-        return grantPermissionButton.should(Condition.visible).exists();
+    public MainActivityPage ifGrantPermissionButtonExistOnPage() {
+        grantPermissionButton.should(Condition.visible).exists();
+        return this;
     }    
 
     @Step("Click grant permissions button")

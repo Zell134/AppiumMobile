@@ -21,18 +21,17 @@ public class HeaderPageTest extends BaseTest{
     @Description("Application is closed via toolbar \"Exit\" button")
     @Test
     public void appClosedViaToolbarButton(){
-        HeaderPage header = new HeaderPage();
         step("Apllication is running", ()-> assertThat(DriverHelper.isAppRunning()).isTrue());
-        header.exitBtnClick();
+        new HeaderPage()
+                .exitBtnClick();
         step("Application has been closed", ()-> assertThat(DriverHelper.isAppRunning()).isFalse());
     }
     
     @Description("Menu is opened via toolbar button")
     @Test
     public void menuOpenedViaToolbarButton(){
-        HeaderPage header = new HeaderPage();        
-        header.menuBtnClick();
-        MainMenuPage menu = new MainMenuPage();
-        menu.isMenuShown();
+        new HeaderPage()
+                .menuBtnClick()
+                .isMenuShown();
     }
 }

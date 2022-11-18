@@ -7,17 +7,19 @@ import io.appium.java_client.MobileBy;
 import io.qameta.allure.Step;
 
 public class HeaderPage {
-    
-    private final SelenideElement menuBtn = $(MobileBy.xpath("//android.widget.ImageButton[@content-desc='Открыть меню']"));
+
+    private final SelenideElement menuBtn = $(MobileBy.xpath("//android.view.ViewGroup/android.widget.ImageButton"));
     private final SelenideElement exitBtn = $(MobileBy.id("com.zell.musicplayer:id/exit"));
     
     @Step("Click main menu button")
-    public void menuBtnClick(){
+    public MainMenuPage menuBtnClick(){
         menuBtn.should(Condition.enabled).click();
+        return new MainMenuPage();
     }
     
      @Step("Click \"Close\" button")
-    public void exitBtnClick(){
+    public HeaderPage exitBtnClick(){
         exitBtn.should(Condition.enabled).click();
+         return this;
     }
 }

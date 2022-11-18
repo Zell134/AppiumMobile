@@ -2,7 +2,6 @@ package tests;
 
 import pageObject.ControlsPage;
 import pageObject.EqualizerPage;
-import pageObject.MainActivityPage;
 import com.codeborne.selenide.Configuration;
 import com.github.romankh3.image.comparison.ImageComparison;
 import com.github.romankh3.image.comparison.model.ImageComparisonResult;
@@ -28,7 +27,8 @@ public class ControlsPageTest extends BaseTest {
     @Description("All elements is visible on start application")
     @Test
     public void isAllElementsVisible_OnStart() {
-        new ControlsPage().isAllElementsVisible();
+        new ControlsPage()
+                .isAllElementsVisible();
     }
 
     @Description("Image of \"Play/Pause\" button changed if click on this one")
@@ -36,16 +36,16 @@ public class ControlsPageTest extends BaseTest {
     public void anotherImageShownOnPlayButton_onPlayClicked() {
 
         ControlsPage controlsPage = new ControlsPage();
-        BufferedImage actualImage = controlsPage.getPlayBtnImage();
+        BufferedImage expectedStartImage = controlsPage.getPlayBtnImage();
         controlsPage.playPause();
-        BufferedImage expectedImage = controlsPage.getPlayBtnImage();
+        BufferedImage stopImage = controlsPage.getPlayBtnImage();
 
-        ImageComparisonResult imageComparisonResult = new ImageComparison(expectedImage, actualImage).compareImages();
+        ImageComparisonResult imageComparisonResult = new ImageComparison(expectedStartImage, stopImage).compareImages();
         assertThat(imageComparisonResult.getImageComparisonState()).isEqualByComparingTo(ImageComparisonState.MISMATCH);
 
         controlsPage.playPause();
-        expectedImage = controlsPage.getPlayBtnImage();
-        imageComparisonResult = new ImageComparison(expectedImage, actualImage).compareImages();
+        BufferedImage actualStartImage = controlsPage.getPlayBtnImage();
+        imageComparisonResult = new ImageComparison(expectedStartImage, actualStartImage).compareImages();
         assertThat(imageComparisonResult.getImageComparisonState()).isEqualByComparingTo(ImageComparisonState.MATCH);
 
 //        ImageComparisonUtil.saveImage(new File("src/test/resources/expectedScreenshots/playBtn.png"), imageComparisonResult.getResult());
@@ -54,20 +54,20 @@ public class ControlsPageTest extends BaseTest {
     @Description("Song name and song info fields should displayed on playing")
     @Test
     public void songInfoIsDisplayed_OnPlaying() {
-        ControlsPage controlsPage = new ControlsPage();
-        isSongInfoIsInvisible(controlsPage);
-        controlsPage.playPause();
-        isSongInfoIsDisplayed(controlsPage);
+        new ControlsPage()
+                .isSongInfoIsInvisible()
+                .playPause()
+                .isSongInfoIsDisplayed();
     }
 
     @Description("Song name and song info fields should disapears on stop playing")
     @Test
     public void songInfoIsInvisible_OnStopPlaying() {
-        ControlsPage controlsPage = new ControlsPage();
-        controlsPage.playPause();
-        isSongInfoIsDisplayed(controlsPage);
-        controlsPage.stop();
-        isSongInfoIsInvisible(controlsPage);
+        new ControlsPage()
+                .playPause()
+                .isSongInfoIsDisplayed()
+                .stop()
+                .isSongInfoIsInvisible();
     }
 
     @Description("The same song info and song name is displayed on pause and resume playing")
@@ -75,14 +75,11 @@ public class ControlsPageTest extends BaseTest {
     public void theSameSongInfoIsDisplayed_OnPlaying() {
         ControlsPage controlsPage = new ControlsPage();
         controlsPage.playPause();
-        String expectedSongInfoText = controlsPage.getSongInfoText();
-        String expectedSongNameText = controlsPage.getSongNameText();
+        String expectedSongInfo = controlsPage.getSongInfo();
         controlsPage.playPause();
-        String songInfoText = controlsPage.getSongInfoText();
-        String songNameText = controlsPage.getSongNameText();
+        String actualSongInfoText = controlsPage.getSongInfo();
         step("Song name and song info fields not changed after resume playing", () -> {
-            assertThat(expectedSongInfoText).isEqualTo(songInfoText);
-            assertThat(expectedSongNameText).isEqualTo(songNameText);
+            assertThat(expectedSongInfo).isEqualTo(actualSongInfoText);
         });
     }
 
@@ -91,15 +88,12 @@ public class ControlsPageTest extends BaseTest {
     public void theSameSongInfoIsDisplayed_OnScreenOrientationChanged() {
         ControlsPage controlsPage = new ControlsPage();
         controlsPage.playPause();
-        String expectedSongInfoText = controlsPage.getSongInfoText();
-        String expectedSongNameText = controlsPage.getSongNameText();
+        String expectedSongInfo = controlsPage.getSongInfo();
 
         rotateScreen(ScreenOrientation.LANDSCAPE);
-        String actualSongInfoText = controlsPage.getSongInfoText();
-        String actualSongNameText = controlsPage.getSongNameText();
+        String actualSongInfo = controlsPage.getSongInfo();
         step("Song name and song info fields is the same after change screen orientation to landscape", () -> {
-            assertThat(expectedSongInfoText).isEqualTo(actualSongInfoText);
-            assertThat(expectedSongNameText).isEqualTo(actualSongNameText);
+            assertThat(expectedSongInfo).isEqualTo(actualSongInfo);
         });
     }
 
@@ -108,16 +102,13 @@ public class ControlsPageTest extends BaseTest {
     public void theSameSongIsPlaying_OnClickNextAndPreviousButton() {
         ControlsPage controlsPage = new ControlsPage();
         controlsPage.playPause();
-        String expectedSongInfoText = controlsPage.getSongInfoText();
-        String expectedSongNameText = controlsPage.getSongNameText();
-        controlsPage.nextSong();
-        controlsPage.previousSong();
-        String actualSongInfoText = controlsPage.getSongInfoText();
-        String actualSongNameText = controlsPage.getSongNameText();
+        String expectedSongInfo = controlsPage.getSongInfo();
+        controlsPage.nextSong()
+                .previousSong();
+        String actualSongInfo = controlsPage.getSongInfo();
 
         step("Next song is plaing after click \"Next\" button", () -> {
-            assertThat(expectedSongInfoText).isEqualTo(actualSongInfoText);
-            assertThat(expectedSongNameText).isEqualTo(actualSongNameText);
+            assertThat(expectedSongInfo).isEqualTo(actualSongInfo);
         });
     }
 
@@ -125,18 +116,15 @@ public class ControlsPageTest extends BaseTest {
     @Test
     public void theSameSongIsPlaying_AfterRestartApp() {
         ControlsPage controlsPage = new ControlsPage();
-        controlsPage.playPause();
-        controlsPage.nextSong();
-        String expectedSongInfoText = controlsPage.getSongInfoText();
-        String expectedSongNameText = controlsPage.getSongNameText();
+        controlsPage.playPause()
+                .nextSong();
+        String expectedSongInfo = controlsPage.getSongInfo();
         closeApp();
         launchApp();
-        String actualSongInfoText = controlsPage.getSongInfoText();
-        String actualSongNameText = controlsPage.getSongNameText();
+        String actualSongInfo = controlsPage.getSongInfo();
 
         step("The same song is playing", () -> {
-            assertThat(expectedSongInfoText).isEqualTo(actualSongInfoText);
-            assertThat(expectedSongNameText).isEqualTo(actualSongNameText);
+            assertThat(expectedSongInfo).isEqualTo(actualSongInfo);
         });
     }
 
@@ -147,8 +135,7 @@ public class ControlsPageTest extends BaseTest {
         PlaylistPage playlist = new PlaylistPage();
         playlist.ifPlaylistExistOnPage();
 
-        controlsPage.equalizerClick();
-        EqualizerPage equalizerPage = new EqualizerPage();
+        EqualizerPage equalizerPage = controlsPage.equalizerClick();
         equalizerPage.isSeekBarsVisible();
 
         controlsPage.equalizerClick();
@@ -158,52 +145,20 @@ public class ControlsPageTest extends BaseTest {
     @Description("Clicking on seek bar change current song progress")
     @Test
     public void progressChanged_OnSeekbarClicking() {
-        ControlsPage controlsPage = new ControlsPage();
-        int initialProgress = controlsPage.getTimerProgress();
-        step("Progress is equals to zero on not playing",
-                () -> assertThat(initialProgress).isEqualTo(0)
-        );
-        controlsPage.playPause();
-        controlsPage.seekBarClick();
-
-        step("Progress is greater than initial progress",
-                () -> assertThat(initialProgress).isLessThan(controlsPage.getTimerProgress())
-        );
+        new ControlsPage()
+                .timerProgressEqualsZero()
+                .playPause()
+                .seekBarClick()
+                .timerProgressGreaterThanZero();
     }
 
     @Description("App do not crashed on clicking on seek bar on stopped state")
     @Test
     public void appNotCrashed_OnSeekbakClickingOnStoppedState() {
-        ControlsPage controlsPage = new ControlsPage();
-        step("Progress is equals to zero on not playing",
-                () -> assertThat(controlsPage.getTimerProgress()).isEqualTo(0)
-        );
-        controlsPage.seekBarClick();
-        step("Progress is equals to zero on not playing",
-                () -> assertThat(controlsPage.getTimerProgress()).isEqualTo(0)
-        );
-    }
+        new ControlsPage()
+                .timerProgressEqualsZero()
+                .seekBarClick()
+                .timerProgressEqualsZero();
 
-    private void isSongInfoIsInvisible(ControlsPage controlsPage) {
-        String songInfoText = controlsPage.getSongInfoText();
-        String songNameText = controlsPage.getSongNameText();
-        step("Song info is invisible when not playing",
-                () -> assertThat(songInfoText).isNull()
-        );
-        step("Song name is invisible when not playing",
-                () -> assertThat(songNameText).isNull()
-        );
     }
-
-    private void isSongInfoIsDisplayed(ControlsPage controlsPage) {
-        String songInfoText = controlsPage.getSongInfoText();
-        String songNameText = controlsPage.getSongNameText();
-        step("Song info is visible and filled with text",
-                () -> assertThat(songInfoText).isNotNull().isNotEmpty()
-        );
-        step("Song name is visible and filled with text",
-                () -> assertThat(songNameText).isNotNull().isNotEmpty()
-        );
-    }
-
 }

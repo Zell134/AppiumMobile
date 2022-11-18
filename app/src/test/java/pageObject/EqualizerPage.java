@@ -18,40 +18,50 @@ public class EqualizerPage {
     private final SelenideElement presetList = $(MobileBy.xpath("//android.widget.Spinner/android.widget.TextView"));
 
     @Step("Check seek bars is visible")
-    public void isSeekBarsVisible() {
+    public EqualizerPage isSeekBarsVisible() {
         for (int i = 0; i < 5; i++) {
             try {
                 assertThat($(MobileBy.AndroidViewTag(String.valueOf(i))).is(Condition.visible)).isTrue();
             } catch (InvalidSelectorException e) {
                 break;
             }
-        }    
+        }
+        return this;
     }
 
     @Step("Click \"Back\" button")
-    public void clickBackButon() {
+    public EqualizerPage clickBackButon() {
         backBtn.should(Condition.enabled).click();
+        return this;
     }
 
     @Step("\"Preset list\" button is visible")
-    public void presetListButtonIsVisible() {
+    public EqualizerPage presetListButtonIsVisible() {
         assertThat(presetList.isDisplayed()).isTrue();
+        return this;
     }
 
     @Step("Click \"Preset list\" button")
-    public void clickPresetListButton() {
+    public EqualizerPage clickPresetListButton() {
         presetList.should(Condition.enabled).click();
+        return this;
     }
 
     @Step("Is presets list populated by presets")
-    public void isPresetListPopulated() {
+    public EqualizerPage isPresetListPopulated() {
         ElementsCollection presets = $$(MobileBy.id("android:id/text1"));
         assertThat(presets).isNotNull();
         assertThat(presets.size()).isGreaterThan(5);
+        return this;
     }
 
     public String getPresetListCurrentValue() {
         return presetList.should(Condition.enabled).getText();
+    }
+
+    @Step("Defaul preset is {0}")
+    public void checkPresetListCurrentValue(String expectedValue){
+        presetList.should(Condition.enabled).getText().equals(expectedValue);
     }
 
     public String getPresetListValue(int position) {
@@ -65,8 +75,9 @@ public class EqualizerPage {
     }
 
     @Step("Select preset in postion {0}")
-    public void selectPresetsByPosition(int position) {
+    public EqualizerPage selectPresetsByPosition(int position) {
         $$(MobileBy.id("android:id/text1")).get(position).click();
+        return this;
     }
 
     private List<SelenideElement> getSeekBars() {

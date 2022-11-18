@@ -16,12 +16,14 @@ public class MainMenuPage {
     private final SelenideElement mainMenu = $(MobileBy.id("com.zell.musicplayer:id/nav_view"));
     
     @Step("Click main menu equalizer button")
-    public void qualizerBtnClick(){
+    public EqualizerPage qualizerBtnClick(){
         qualizerBtn.should(Condition.enabled).click();
+        return new EqualizerPage();
     }
     
     @Step("Menu is shown")
-    public void isMenuShown(){
+    public MainMenuPage isMenuShown(){
         assertThat(mainMenu.is(Condition.visible)).isTrue();
+        return this;
     }
 }
